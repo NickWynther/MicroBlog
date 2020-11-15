@@ -33,18 +33,18 @@ namespace MicroBlog.Controllers
             {
                 return NotFound();
             }
-    
-            return Ok(comments);
-        }
 
+            return comments;
+        }
+ 
         // POST api/comment
         [HttpPost]
-        public async Task<ActionResult<Post>> Post(CommentInput input)
+        public async Task<ActionResult<Comment>> Post(CommentInput input)
         {
             var comment = new Comment(input);
             _repo.AddAsync(comment);
             await _repo.SaveAsync();
-            return Ok(comment);
+            return comment;
         }
     }
 }

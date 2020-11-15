@@ -62,7 +62,7 @@ namespace MicroBlog.Controllers
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Post>> Search(string search)
+        public async Task<ActionResult<IEnumerable<Post>>> Search(string search)
         {
             var posts = await _repo.GetTitleContainAsync(search);
             if (posts == null)
@@ -70,7 +70,7 @@ namespace MicroBlog.Controllers
                 return NotFound();
             }
 
-            return Ok(posts);
+            return posts;
         }
 
         // POST api/post

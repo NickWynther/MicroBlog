@@ -10,7 +10,7 @@ namespace MicroBlog.Repo
     {
         void AddAsync(Comment comment);
         Task SaveAsync();
-        public IEnumerable<Comment> GetForPost(int id);
+        public List<Comment> GetForPost(int id);
 
     }
 }

@@ -24,7 +24,7 @@ namespace MicroBlog.Repo
             await _blogContext.SaveChangesAsync();
         }
 
-        public IEnumerable<Comment> GetForPost(int id)
+        public List<Comment> GetForPost(int id)
         {
             return _blogContext.Comments.Where(x => x.PostId == id).ToList();
         }
