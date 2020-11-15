@@ -23,30 +23,24 @@ namespace MicroBlog.Controllers
 
         // GET api/post -- ALL POSTS
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> GetAll()
-        {
-            return await _repo.GetAllAsync();
-        }
+        public async Task<IEnumerable<Post>> GetAll() 
+            => await _repo.GetAllAsync();
 
         // GET api/post/today -- Posted last 24h
         [HttpGet]
         [Route("today")]
-        public async Task<ActionResult<IEnumerable<Post>>> Today()
+        public async Task<IEnumerable<Post>> Today()
         {
             var yesterday = DateTime.Now.AddDays(-1);
             var todayPosts = await _repo.GetYoungerThanAsync(yesterday);
             return todayPosts;
-
         }
 
         //GET api/post/random -- Random post
         [HttpGet]
         [Route("random")]
-        public ActionResult<Post> Random()
-        {
-            var randomPost = _repo.PickRandom();
-            return new ObjectResult(randomPost);
-        }
+        public Post Random() => _repo.PickRandom();
+ 
 
         // GET api/post/5 
         [HttpGet("{id}")]
@@ -76,16 +70,12 @@ namespace MicroBlog.Controllers
 
         // POST api/post
         [HttpPost]
-        public async Task<ActionResult<Post>> Post(PostInput input)
+        public async Task<Post> Post(PostInput input)
         {
-            if (input == null)
-            {
-                return BadRequest();
-            }
             var post = new Post(input);
              _repo.AddAsync(post);
             await _repo.SaveAsync();
-            return Ok(post);
+            return post;
         }
     }
 }
