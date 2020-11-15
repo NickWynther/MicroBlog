@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="author" content="Nikita Kuznecovs">
+    <meta charset="UTF-8" />
+    <title>MicroBlog</title>
+    
+    <script src="https://unpkg.com/vue@next"></script>
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/sticky-footer-navbar/">
+
+    <link href="styles/bootstrap.css" rel="stylesheet">
+    <link href="styles/sticky-footer-navbar.css" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js"></script>
+  </head>
+  <body>
+    
+    <div id="app"></div>
+
+    <!-- Import App -->
+    <script src="./App.js"></script>
+     <!-- Import Components -->
+     <script src="./components/BlogPost.js"></script>
+     <script src="./components/BlogComment.js"></script>
+     <script src="./components/CommentInput.js"></script>
+     <script src="./components/PostInput.js"></script>
+     <script src="./components/AppNavbar.js"></script>
+     <script src="./components/AppFooter.js"></script>
+     <script src="./components/TimeDisplay.js"></script>
+     <!--Mount App-->
+    <script>
+        const mountedApp = app.mount('#app')
+    </script>
+
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="scripts/jquery-3.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
+    <script src="scripts/popper.js"></script>
+    <script src="scripts/bootstrap.js"></script>
+  </body>
+</html>
