@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MicroBlog.Models.Input;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -20,7 +21,15 @@ namespace MicroBlog.Models
         public string Author { get; set; }
         [Required]
         public DateTime Time { get; set; }
-        public ICollection<Comment> Comments { get; set; }
 
+        public Post() {}
+        private const string _anonymousUsername = "Anonymous";
+        public Post(PostInput input)
+        {
+            Title = input.Title;
+            Text = input.Text;
+            Author = (input.Author.Length < 1) ? _anonymousUsername : input.Author;
+            Time = DateTime.Now;
+        }
     }
 }

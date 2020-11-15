@@ -28,6 +28,7 @@ namespace MicroBlog
         {
             var connection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<BlogDbContext>(options => options.UseSqlServer(connection));
+            services.AddCors();
             services.AddControllers();
             // Register Swagger  
             services.AddSwaggerGen();
@@ -39,6 +40,13 @@ namespace MicroBlog
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>

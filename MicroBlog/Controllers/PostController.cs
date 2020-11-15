@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using MicroBlog.Models;
-using MicroBlog.Models.View;
+using MicroBlog.Models.Input;
 using MicroBlog.Repo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,18 +15,17 @@ namespace MicroBlog.Controllers
     [Route("api/[controller]")]
     public class PostController : ControllerBase
     {
-        private BlogDbContext _repo;
-        private const string _anonymousUsername = "Anonymous";
-        public PostController(BlogDbContext repo)
+        private readonly PostRepository _repo;
+        public PostController(BlogDbContext blogContext)
         {
-            _repo = repo;
+            _repo = new PostRepository(blogContext);
         }
 
         // GET api/post -- ALL POSTS
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Post>>> Get()
+        public async Task<ActionResult<IEnumerable<Post>>> GetAll()
         {
-            return await _repo.Posts.ToListAsync();
+            return await _repo.GetAllAsync();
         }
 
         // GET api/post/today -- Posted last 24h
@@ -34,46 +34,57 @@ namespace MicroBlog.Controllers
         public async Task<ActionResult<IEnumerable<Post>>> Today()
         {
             var yesterday = DateTime.Now.AddDays(-1);
-            return await _repo.Posts.Where(x => x.Time.Date > yesterday).ToListAsync();
+            var todayPosts = await _repo.GetYoungerThanAsync(yesterday);
+            return todayPosts;
+
+        }
+
+        //GET api/post/random -- Random post
+        [HttpGet]
+        [Route("random")]
+        public ActionResult<Post> Random()
+        {
+            var randomPost = _repo.PickRandom();
+            return new ObjectResult(randomPost);
         }
 
         // GET api/post/5 
         [HttpGet("{id}")]
         public async Task<ActionResult<Post>> Get(int id)
         {
-            var post = await _repo.Posts.FirstOrDefaultAsync(x => x.Id == id);
+            var post = await _repo.GetByIdAsync(id);
             if (post == null)
             {
                 return NotFound();
             }
 
-            return new ObjectResult(post);
+            return post;
+        }
+
+        //GET api/Post/search?search=
+        [HttpGet("search")]
+        public async Task<ActionResult<Post>> Search(string search)
+        {
+            var posts = await _repo.GetTitleContainAsync(search);
+            if (posts == null)
+            {
+                return NotFound();
+            }
+
+            return new ObjectResult(posts);
         }
 
         // POST api/post
         [HttpPost]
-        public async Task<ActionResult<Post>> Post(PostView postView)
+        public async Task<ActionResult<Post>> Post(PostInput input)
         {
-            if (postView == null)
+            if (input == null)
             {
                 return BadRequest();
             }
-
-            if (postView.Author.Length < 1)
-            {
-                postView.Author = _anonymousUsername;
-            }
-
-            var post = new Post()
-            {
-                Title = postView.Title,
-                Text = postView.Text,
-                Author = postView.Author,
-                Time = DateTime.Now
-            };
-
-            _repo.Posts.Add(post);
-            await _repo.SaveChangesAsync();
+            var post = new Post(input);
+             _repo.AddAsync(post);
+            await _repo.SaveAsync();
             return Ok(post);
         }
     }

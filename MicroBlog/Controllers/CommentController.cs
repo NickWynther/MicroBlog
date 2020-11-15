@@ -1,5 +1,5 @@
 ﻿using MicroBlog.Models;
-using MicroBlog.Models.View;
+using MicroBlog.Models.Input;
 using MicroBlog.Repo;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,52 +14,34 @@ namespace MicroBlog.Controllers
     [Route("api/[controller]")]
     public class CommentController : ControllerBase
     {
-        private BlogDbContext _repo;
-        private const string _anonymousUsername = "Anonymous";
-        public CommentController(BlogDbContext repo)
+        private readonly ICommentRepository _repo;
+        public CommentController(BlogDbContext blogContext)
         {
-            _repo = repo;
+            _repo = new CommentRepository(blogContext);
         }
 
         // GET api/comment/5  -- all coments for post 5
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<Comment>>> Get(int id)
+        public ActionResult<IEnumerable<Comment>> Get(int id)
         {
-            var comments = _repo.Comments.Where( x => x.PostId == id);
+            var comments = _repo.GetForPost(id);
+
             if (comments == null)
             {
                 return NotFound();
             }
-
-            var result = await comments.ToListAsync();
-
-            return new ObjectResult(result);
+    
+            return new ObjectResult(comments);
         }
 
         // POST api/comment
         [HttpPost]
-        public async Task<ActionResult<Post>> Post(CommentView commentView)
+        public async Task<ActionResult<Post>> Post(CommentInput input)
         {
-            if (commentView == null)
-            {
-                return BadRequest();
-            }
-
-            if (commentView.Author.Length < 1)
-            {
-                commentView.Author = _anonymousUsername;
-            }
-
-            var comment = new Comment()
-            {
-                Text = commentView.Text,
-                Author = commentView.Author,
-                PostId = commentView.PostId,
-                Time = DateTime.Now
-            };
-
-            _repo.Comments.Add(comment);
-            await _repo.SaveChangesAsync();
+            //if (ModelState.isValid)
+            var comment = new Comment(input);
+            _repo.AddAsync(comment);
+            await _repo.SaveAsync();
             return Ok(comment);
         }
     }
