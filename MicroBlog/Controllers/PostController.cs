@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MicroBlog.Models;
 using MicroBlog.Models.Input;
 using MicroBlog.Repo;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,6 +45,8 @@ namespace MicroBlog.Controllers
 
         // GET api/post/5 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Post>> Get(int id)
         {
             var post = await _repo.GetByIdAsync(id);
@@ -57,6 +60,8 @@ namespace MicroBlog.Controllers
 
         //GET api/Post/search?search=
         [HttpGet("search")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Post>> Search(string search)
         {
             var posts = await _repo.GetTitleContainAsync(search);
@@ -65,7 +70,7 @@ namespace MicroBlog.Controllers
                 return NotFound();
             }
 
-            return new ObjectResult(posts);
+            return Ok(posts);
         }
 
         // POST api/post
